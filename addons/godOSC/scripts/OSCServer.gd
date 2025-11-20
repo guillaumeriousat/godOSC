@@ -35,7 +35,6 @@ func _process(_delta):
 	server.poll()
 	if server.is_connection_available():
 		var peer: PacketPeerUDP = server.take_connection()
-		print("Accepted peer: %s:%s" % [peer.get_packet_ip(), peer.get_packet_port()])
 		# Keep a reference so we can keep contacting the remote peer.
 		peers.append(peer)
 	
@@ -54,7 +53,6 @@ func parse():
 				parse_message(packet)
 
 func parse_message(packet: PackedByteArray):
-	#print(packet)
 	var comma_index = packet.find(44)
 	var address = packet.slice(0, comma_index).get_string_from_ascii()
 	var args = packet.slice(comma_index, packet.size())
@@ -64,7 +62,6 @@ func parse_message(packet: PackedByteArray):
 	args = args.slice(ceili((tags.length() + 1) / 4.0) * 4, args.size())
 	
 	for tag in tags.to_ascii_buffer():
-		#print(tags)
 		match tag:
 			44: #,: comma
 				pass
@@ -140,7 +137,6 @@ func parse_bundle(packet: PackedByteArray):
 		
 		bund_packet.remove_at(0)
 		bund_packet.insert(0,0)
-		#print(bund_packet)
 		var comma_index = bund_packet.find(44)
 		var address = bund_packet.slice(1, comma_index).get_string_from_ascii()
 		var args = bund_packet.slice(comma_index, packet.size())
@@ -151,7 +147,6 @@ func parse_bundle(packet: PackedByteArray):
 		args = args.slice(ceili((tags.length() + 1) / 4.0) * 4, args.size())
 		
 		for tag in tags.to_ascii_buffer():
-			#print(tags)
 			match tag:
 				44: #,: comma
 					pass
@@ -179,6 +174,5 @@ func parse_bundle(packet: PackedByteArray):
 					vals.append(args)
 				
 				
-		print(address, " ", vals)
 		incoming_messages[address] = vals
 		message_received.emit(address, vals, Time.get_unix_time_from_system())
